@@ -3,8 +3,8 @@
 #include "fd1.h"
 #endif
 
-#define ROWS 4
-#define COLS 4
+#define MATRIX_COLS 4
+#define MATRIX_ROWS 4
 
 // as output (tris = 0)
 #define ROW0 LATBbits.LATB0

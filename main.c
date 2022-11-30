@@ -52,12 +52,21 @@ int main(void) {
                 break;
 
             case 1:
-                d = eeprom_93c46_read();
+                d = eeprom_93c46_read(0);
 
                 lcd_cls();
                 sprintf(lcd, "%d", d);
                 sprintf(lcd + LCD_WIDTH, "0x%X", d);
                 lcd_update();
+
+                __delay_ms(5000);
+
+                state = 2;
+
+                break;
+
+            case 2:
+                break;
         }
 
     } // Infinite while loop ends here

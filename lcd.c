@@ -73,7 +73,6 @@ void lcd_init() {
     LCD_RW = 0;
     __delay_ms(50);
 
-
     lcd_data(0x38, 0); // a row display, 5x8 char size
     lcd_data(0x0E, 0); // display on, cursor on, blink off
     lcd_data(0x01, 0); // clear display
@@ -97,12 +96,12 @@ void lcd_update() {
 
 void lcd_cgram() {
     lcd_data(0x40, 0); // set cgram, define char 0
-    lcd_data(0x00, 1); // 0. 8x5
+    lcd_data(0x00, 1); // 0
     lcd_data(0x0a, 1); // 1
     lcd_data(0x15, 1); // 2
-    lcd_data(0x11, 1); //  3
+    lcd_data(0x11, 1); // 3
     lcd_data(0x0a, 1); // 4
     lcd_data(0x04, 1); // 5
     lcd_data(0x00, 1); // 6
-    lcd_data(0x00, 1); //  7
+    lcd_data(0x00, 1); // 7
 }

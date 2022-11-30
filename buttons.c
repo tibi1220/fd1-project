@@ -34,7 +34,7 @@ int get_pressed_button() {
     ROW0 = 0;
     col = get_pressed_button_col();
     if (col != -1) {
-        return col;
+        return col + 0 * MATRIX_COLS;
     }
 
     // Check row 1
@@ -42,7 +42,7 @@ int get_pressed_button() {
     ROW1 = 0;
     col = get_pressed_button_col();
     if (col != -1) {
-        return col + 4;
+        return col + 1 * MATRIX_COLS;
     }
 
     // Check row 2
@@ -50,7 +50,7 @@ int get_pressed_button() {
     ROW2 = 0;
     col = get_pressed_button_col();
     if (col != -1) {
-        return col + 8;
+        return col + 2 * MATRIX_COLS;
     }
 
     // Check row 3
@@ -58,7 +58,7 @@ int get_pressed_button() {
     ROW3 = 0;
     col = get_pressed_button_col();
     if (col != -1) {
-        return col + 12;
+        return col + 3 * MATRIX_COLS;
     }
 
     // Set row3 to inactive state
@@ -79,7 +79,7 @@ void (*debouncers[])(void) = {
 };
 
 void debounce_button(int id) {
-    const int col = id % 4;
+    const int col = id % MATRIX_COLS;
     
     __delay_ms(10);
     (*debouncers[col])();

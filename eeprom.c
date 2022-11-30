@@ -3,7 +3,7 @@
 enum EEPROM_STATE {
     STANDBY,
     SET_READ,
-    WAIT_A,
+    SET_ADDRESS,
     READ,
     FINISHED
 };
@@ -11,9 +11,12 @@ enum EEPROM_STATE {
 enum EEPROM_STATE state = STANDBY;
 int h = 0;
 unsigned int d = 0;
+int a[6] = {0, 0, 0, 0, 0, 0};
 
 void __attribute__((__interrupt__, __auto_psv__))
 _T1Interrupt(void) {
+    PIR1bits.TMR1IF = 0;
+
     if (state == STANDBY) return;
     CLK ^= 1;
 
@@ -34,13 +37,14 @@ _T1Interrupt(void) {
                         DI = 0;
                         h = 0;
                         d = 0;
-                        state = WAIT_A;
+                        state = SET_ADDRESS;
                         break;
                 }
                 break;
 
                 // Wait 6 cycles
-            case WAIT_A:
+            case SET_ADDRESS:
+                DI = a[h];
                 if (++h == 5) {
                     h = 16;
                     state = READ;
@@ -50,11 +54,11 @@ _T1Interrupt(void) {
                 // Get 16 data bits
             case READ:
                 d += pow(DO, h--);
-                if(h == 0) {
+                if (h == 0) {
                     state = FINISHED;
                 }
                 break;
-                
+
             case FINISHED:
                 DI = 0;
                 break;
@@ -76,14 +80,22 @@ void eeprom_93c46_init() {
 
     // Chip select active
     CS = 1;
+
 }
 
-unsigned int eeprom_93c46_read() {
+unsigned int eeprom_93c46_read(unsigned char address) {
+    // a = {0, 0, 0, 0, 0, 0}; //address;
+
     state = SET_READ;
-    
-    while(state != FINISHED) Nop();
-    
+    PIR1bits.TMR1IF = 0;
+    PIE1bits.TMR1IE = 1;
+    IPR1bits.TMR1IP = 1;
+
+    while (state != FINISHED) Nop();
+
     state = STANDBY;
-    
+
+    PIE1bits.TMR1IE = 0;
+
     return d;
 }
