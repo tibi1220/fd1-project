@@ -5,7 +5,10 @@ void buttons_init() {
     TRISB &= 0b11110000; // Turn off last 4 bits
     // Vertical as input (B4, B5, A3, A5)
     TRISB |= 0b00110000; // Turn on bit 4 and bit 5
-    TRISA |= 0b00101000; // Turn on bit 3 and bit 5
+    TRISAbits.TRISA3 = 1; // Turn on bit 3 and bit 5
+    TRISAbits.TRISA5 = 1;
+    
+    TRISA = 0b11111111;
 
     // Use pull ups for RB4 and RB5
     // Enable pull ups
@@ -19,10 +22,10 @@ void buttons_init() {
 }
 
 int get_pressed_button_col() {
-    if (!COL0) return 0;
-    if (!COL1) return 1;
-    if (!COL2) return 2;
-    if (!COL3) return 3;
+    if (!COL0) { return 0; }
+    if (!COL1) { return 1; }
+    // if (!COL2) { return 2; }
+    // if (!COL3) { return 3; }
 
     return -1;
 }
@@ -34,6 +37,7 @@ int get_pressed_button() {
     ROW0 = 0;
     col = get_pressed_button_col();
     if (col != -1) {
+        ROW0 = 1;
         return col + 0 * MATRIX_COLS;
     }
 
@@ -42,6 +46,7 @@ int get_pressed_button() {
     ROW1 = 0;
     col = get_pressed_button_col();
     if (col != -1) {
+        ROW1 = 1;
         return col + 1 * MATRIX_COLS;
     }
 
@@ -50,6 +55,7 @@ int get_pressed_button() {
     ROW2 = 0;
     col = get_pressed_button_col();
     if (col != -1) {
+        ROW2 = 1;
         return col + 2 * MATRIX_COLS;
     }
 
@@ -58,6 +64,7 @@ int get_pressed_button() {
     ROW3 = 0;
     col = get_pressed_button_col();
     if (col != -1) {
+        ROW3 = 1;
         return col + 3 * MATRIX_COLS;
     }
 
@@ -66,26 +73,43 @@ int get_pressed_button() {
     return -1;
 }
 
-void debounce_col_0() { while(!COL0) Nop(); }
-void debounce_col_1() { while(!COL1) Nop(); }
-void debounce_col_2() { while(!COL2) Nop(); }
-void debounce_col_3() { while(!COL3) Nop(); }
+void debounce_col_0() {
+    while (!COL0) Nop();
+}
+
+void debounce_col_1() {
+    while (!COL1) Nop();
+}
+
+void debounce_col_2() {
+    while (!COL2) Nop();
+}
+
+void debounce_col_3() {
+    while (!COL3) Nop();
+}
 
 void (*debouncers[])(void) = {
-  &debounce_col_0,
-  &debounce_col_1,
-  &debounce_col_2,
-  &debounce_col_3
+    &debounce_col_0,
+    &debounce_col_1,
+    &debounce_col_2,
+    &debounce_col_3
 };
 
 void debounce_button(int id) {
+    if (id == -1) return;
+
     const int col = id % MATRIX_COLS;
-    
+
+    ROW0 = 0;
+    ROW1 = 0;
+    ROW2 = 0;
+    ROW3 = 0;
+
     __delay_ms(10);
     (*debouncers[col])();
     __delay_ms(10);
-    
-    // Set rows to inactive state
+
     ROW0 = 1;
     ROW1 = 1;
     ROW2 = 1;

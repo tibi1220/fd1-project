@@ -11,4 +11,4 @@
 
 // Defines
 #define SYS_FREQ 4000000L
-#define _XTAL_FREQ SYS_FREQ / 4
+#define _XTAL_FREQ 1000000L

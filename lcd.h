@@ -9,7 +9,7 @@
 #define LCD_RS LATEbits.LATE0 // LCD register select
 #define LCD_RW LATEbits.LATE1 // LCD read/write
 #define LCD_E LATEbits.LATE2 // LCD enable
-#define LCD_BF PORTDbits.RD7 // LCD data last register
+#define LCD_BF PORTDbits.RD7 // LCD busy flag
 
 extern char lcd[LCD_WIDTH*LCD_HEIGHT + 1];
 
