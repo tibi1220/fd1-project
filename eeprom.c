@@ -10,35 +10,109 @@ void eeprom_93c46_init() {
     TRISCbits.TRISC4 = 1; // Input
 
     // Chip select active
-    CS = 1;
-
-    // Sampling mode
-    SSPCON1bits.CKP = 0;
-    SSPSTATbits.CKE = 0;
-    SSPSTATbits.SMP = 0;
-
-    // Interrupt
-    IPR1bits.SSPIP = 1;
-    PIE1bits.SSPIE = 1;
-    PIR1bits.SSPIF = 0;
+    CS = 0;
 
     // Digital
     ADCON0 = 0x00;
     ADCON1 = 0x0F;
-    
-    // Enable SSP
-    SSPCON1bits.SSPEN = 1;
+
+    CLK = 0;
 }
 
-char eeprom_93c46_read(unsigned char address) {
-    // Enable SSP
-    // SSPCON1bits.SSPEN = 1;
+void toggle_clk() {
+    CLK ^= 1;
+}
+
+void delay_clk_full() {
+    __delay_ns(500);
+}
+
+void delay_clk_half() {
+    __delay_ns(250);
+}
+
+void clk_before() {
+    CLK ^= 1;
+    __delay_ns(500);
+    CLK ^= 1;
+    __delay_ns(250);
+}
+
+void clk_after() {
+    __delay_ns(250);
+}
+
+void clk_full() {
+    CLK ^= 1;
+    __delay_ns(500);
+    CLK ^= 1;
+    __delay_ns(500);
+}
+
+unsigned int eeprom_93c46_read(
+    unsigned char a5, 
+    unsigned char a4, 
+    unsigned char a3, 
+    unsigned char a2, 
+    unsigned char a1, 
+    unsigned char a0
+) {
+    CLK = 0;
+    CS = 1;
+    __delay_ms(100);
+
+    clk_full();
+    clk_full();
+    clk_full();
+
+    // OPCODE 1-1-0
+    clk_before();
+    DI = 1;
+    clk_after();
+
+    clk_before();
+    DI = 1;
+    clk_after();
+
+    clk_before();
+    DI = 0;
+    clk_after();
+
+    // Address
+    clk_before();
+    DI = a5;
+    clk_after();
     
-    SSPBUF=0xff;		    /* Copy flush byte in SSBUF */
-    while(!PIR1bits.SSPIF);	/* Wait for complete 1 byte transmission */
-    PIR1bits.SSPIF=0;
-    return SSPBUF;		    /* Return received byte */   
+    clk_before();
+    DI = a4;
+    clk_after();
     
-    // Disable SSP
-    // SSPCON1bits.SSPEN = 0;
+    clk_before();
+    DI = a3;
+    clk_after();
+    
+    clk_before();
+    DI = a2;
+    clk_after();
+    
+    clk_before();
+    DI = a1;
+    clk_after();
+    
+    clk_before();
+    DI = a0;
+    clk_after();
+    
+    unsigned int d = 0;
+    
+    // Data out
+    for(unsigned char i = 15; i >= 0; i++) {
+        clk_before();
+        d += pow(DO, i);
+        clk_after();
+    }
+    
+    DI = 0;
+    
+    return d;
 }
