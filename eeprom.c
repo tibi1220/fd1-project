@@ -19,34 +19,22 @@ void eeprom_93c46_init() {
     CLK = 0;
 }
 
-void toggle_clk() {
-    CLK ^= 1;
-}
-
-void delay_clk_full() {
-    __delay_ns(500);
-}
-
-void delay_clk_half() {
-    __delay_ns(250);
-}
-
 void clk_before() {
-    CLK ^= 1;
-    __delay_ns(500);
-    CLK ^= 1;
-    __delay_ns(250);
+    CLK = 1;
+    Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
+    CLK = 0;
+    Nop(); Nop(); Nop();
 }
 
 void clk_after() {
-    __delay_ns(250);
+    Nop(); Nop(); Nop();
 }
 
 void clk_full() {
-    CLK ^= 1;
-    __delay_ns(500);
-    CLK ^= 1;
-    __delay_ns(500);
+    CLK = 1;
+    Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
+    CLK = 0;
+    Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
 }
 
 unsigned int eeprom_93c46_read(
@@ -59,60 +47,69 @@ unsigned int eeprom_93c46_read(
 ) {
     CLK = 0;
     CS = 1;
-    __delay_ms(100);
+    unsigned int d = 0;
+    __delay_ms(50);
 
+    // 3 full clock
+    // ___...___|‾‾‾‾‾‾‾‾|________|‾‾‾‾‾‾‾‾|________|‾‾‾‾‾‾‾‾|________
     clk_full();
     clk_full();
     clk_full();
 
-    // OPCODE 1-1-0
+    // Write OP-code
+    // |‾‾‾‾‾‾‾‾‾‾|__DI = 1__|‾‾‾‾‾‾‾‾‾‾|__DI = 1__|‾‾‾‾‾‾‾‾‾‾|__DI = 0__
     clk_before();
-    DI = 1;
+    DI = 1; Nop(); Nop(); Nop();
     clk_after();
 
     clk_before();
-    DI = 1;
+    DI = 1; Nop(); Nop(); Nop();
     clk_after();
 
     clk_before();
-    DI = 0;
+    DI = 0; Nop(); Nop(); Nop();
     clk_after();
 
     // Address
+    // |‾‾‾‾|_ad5_|‾‾‾‾|_ad4_|‾‾‾‾|_ad3_|‾‾‾‾|_ad2_|‾‾‾‾|_ad1_|‾‾‾‾|_ad0_
     clk_before();
-    DI = a5;
+    DI = a5; Nop(); Nop(); Nop();
     clk_after();
     
     clk_before();
-    DI = a4;
+    DI = a4; Nop(); Nop(); Nop();
     clk_after();
     
     clk_before();
-    DI = a3;
+    DI = a3; Nop(); Nop(); Nop();
     clk_after();
     
     clk_before();
-    DI = a2;
+    DI = a2; Nop(); Nop(); Nop();
     clk_after();
     
     clk_before();
-    DI = a1;
+    DI = a1; Nop(); Nop(); Nop();
     clk_after();
     
     clk_before();
-    DI = a0;
+    DI = a0; Nop(); Nop(); Nop();
     clk_after();
-    
-    unsigned int d = 0;
     
     // Data out
+    // |‾‾‾‾|_DOF_|‾‾‾‾|_DOE_|‾‾‾‾|_..._|‾‾‾‾|_DO1_|‾‾‾‾|_DO0_
     for(unsigned char i = 15; i >= 0; i++) {
         clk_before();
         d += pow(DO, i);
         clk_after();
     }
     
-    DI = 0;
+    // Deselect chip
+    // |‾‾‾‾‾‾‾‾‾‾|__CS=0, DI=0__...___
+    clk_before();
+    CS = 0; Nop();
+    DI = 0; Nop();
+    clk_after();
     
     return d;
 }
