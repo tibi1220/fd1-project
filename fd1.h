@@ -10,5 +10,5 @@
 #include <math.h>
 
 // Defines
-#define SYS_FREQ 4000000L
-#define _XTAL_FREQ 1000000L
+#define SYS_FREQ 20000000L
+#define _XTAL_FREQ 5000000L

@@ -21,13 +21,13 @@ void eeprom_93c46_init() {
 
 void clk_before() {
     CLK = 1;
-    Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
-    CLK = 0;
-    Nop(); Nop(); Nop();
+    Nop(); Nop(); Nop(); 
 }
 
 void clk_after() {
     Nop(); Nop(); Nop();
+    CLK = 0;
+    Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
 }
 
 void clk_full() {
@@ -57,7 +57,7 @@ unsigned int eeprom_93c46_read(
     clk_full();
 
     // Write OP-code
-    // |‾‾‾‾‾‾‾‾‾‾|__DI = 1__|‾‾‾‾‾‾‾‾‾‾|__DI = 1__|‾‾‾‾‾‾‾‾‾‾|__DI = 0__
+    // |‾‾‾‾‾DI=1‾‾‾‾‾|____|‾‾‾‾‾DI=1‾‾‾‾‾|____|‾‾‾‾‾DI=0‾‾‾‾‾|____
     clk_before();
     DI = 1; Nop(); Nop(); Nop();
     clk_after();
@@ -71,7 +71,7 @@ unsigned int eeprom_93c46_read(
     clk_after();
 
     // Address
-    // |‾‾‾‾|_ad5_|‾‾‾‾|_ad4_|‾‾‾‾|_ad3_|‾‾‾‾|_ad2_|‾‾‾‾|_ad1_|‾‾‾‾|_ad0_
+    // |‾‾ad5‾‾|____|‾‾ad4‾‾|____|‾‾ad3‾‾|____|‾‾ad2‾‾|____|‾‾ad1‾‾|____|‾‾ad0‾‾|____
     clk_before();
     DI = a5; Nop(); Nop(); Nop();
     clk_after();
@@ -96,16 +96,21 @@ unsigned int eeprom_93c46_read(
     DI = a0; Nop(); Nop(); Nop();
     clk_after();
     
+    clk_full();
+    
     // Data out
-    // |‾‾‾‾|_DOF_|‾‾‾‾|_DOE_|‾‾‾‾|_..._|‾‾‾‾|_DO1_|‾‾‾‾|_DO0_
-    for(unsigned char i = 15; i >= 0; i++) {
-        clk_before();
-        d += pow(DO, i);
-        clk_after();
+    // |‾‾DOF‾‾|____|‾‾DOE‾‾|____|‾‾...‾‾|____|‾‾DO1‾‾|____|‾‾DO0‾‾|____
+    for(int i = 15; i >= 0; i--) {
+        CLK = 1;
+        Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
+        CLK = 0;
+        Nop(); Nop(); Nop();
+        d += DO * pow(2, i);
+        Nop(); Nop(); Nop();
     }
     
     // Deselect chip
-    // |‾‾‾‾‾‾‾‾‾‾|__CS=0, DI=0__...___
+    // |‾‾‾‾‾CS=0, DI=0‾‾‾‾‾|____...___
     clk_before();
     CS = 0; Nop();
     DI = 0; Nop();
