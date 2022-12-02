@@ -12,13 +12,13 @@
 // READ OPCODE
 #define OPCODE 0b10
 
+#define A_LEN 6
+#define DO_LEN 16
+#define MEMORY_SIZE 64
+
 void eeprom_93c46_init();
 unsigned int eeprom_93c46_read(
-    unsigned char a5, 
-    unsigned char a4, 
-    unsigned char a3, 
-    unsigned char a2, 
-    unsigned char a1, 
-    unsigned char a0
-);
+        int int_address,
+        unsigned char *ptr
+        );
 // char eeprom_93c46_read(unsigned char address);
