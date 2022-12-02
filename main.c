@@ -33,9 +33,11 @@ int main(void) {
     // unsigned char bits[64][16];
     // unsigned char* (ptr[64]);
     void* ptr;
-    char c = 0;
+    const char shift = 32;
+    const char limit = 16;
+    const char width = 2;
     
-    for (char i = 0 + c; i < 8 + c; i++) {
+    for (char i = shift; i < limit + shift; i++) {
         lcd_cls();
         sprintf(lcd, "Hello World! %d ", i);
         lcd_update();
@@ -43,8 +45,8 @@ int main(void) {
     }
 
     lcd_cls();
-    for (char i = 0; i < 8; i++) {
-        sprintf(lcd + 4 * i, "%02X", data[i + c]);
+    for (char i = 0; i < limit; i++) {
+        sprintf(lcd + width * i, "%02X", data[i + shift]);
     }
     lcd_update();
 

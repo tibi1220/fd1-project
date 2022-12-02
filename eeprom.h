@@ -12,9 +12,9 @@
 // READ OPCODE
 #define OPCODE 0b10
 
-#define A_LEN 6
-#define DO_LEN 16
-#define MEMORY_SIZE 64
+#define A_LEN 7
+#define DO_LEN 8
+#define MEMORY_SIZE 128
 
 void eeprom_93c46_init();
 unsigned int eeprom_93c46_read(

@@ -23,27 +23,31 @@ unsigned int eeprom_93c46_read(
     int int_address, 
     unsigned char *ptr
 ) {
-    unsigned char address[A_LEN];
-    unsigned char data[DO_LEN];
+    signed char address[A_LEN];
+    signed char data[DO_LEN];
     // unsigned int weights[data_length];
     
-    for(unsigned char i = 0; i < DO_LEN; i++) {
+    for(int i = 0; i < DO_LEN; i++) {
         data[i] = 0;
         // weights[i] = pow(2, i);
     }
     
-    for(unsigned char i = 0; i < A_LEN; i++) {
+    for(int i = 0; i < A_LEN; i++) {
         address[i] = (int_address >> i) & 0b1;
     }
     
     CLK = 0;
     CS = 1;
-    DI = 1;
     unsigned int d = 0;
     __delay_ms(50);
     
     // OPCODE: 1 - 1 - 0
     // ___...CS=1,DI=1...___|‾‾‾‾‾‾‾‾‾‾|_DI=1_|‾‾‾‾‾‾‾‾‾‾|_DI=0_
+    
+    Nop(); Nop(); Nop(); Nop();
+    DI = 1; Nop();
+    Nop(); Nop(); Nop(); Nop();
+    
     CLK = 1;
     
     Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
@@ -64,6 +68,12 @@ unsigned int eeprom_93c46_read(
     DI = 0; Nop();
     Nop(); Nop(); Nop(); Nop();
     
+    
+    CLK = 1;
+    Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
+    CLK = 0;
+    Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
+
     // Address
     // |‾‾‾‾‾‾‾‾‾‾|_AD5_|‾‾‾‾‾‾‾‾‾‾|_AD4_|‾‾‾‾‾‾‾‾‾‾|_AD3_|‾‾‾‾‾‾‾‾‾‾|_AD2_|‾‾‾‾‾‾‾‾‾‾|_AD1_|‾‾‾‾‾‾‾‾‾‾|_AD0_
     for(int i = A_LEN - 1; i >= 0; i--) {
@@ -78,6 +88,7 @@ unsigned int eeprom_93c46_read(
         Nop(); Nop(); Nop();
     }
     
+    
     // Data out
     // |‾‾‾‾‾‾‾‾‾‾|_DOF_|‾‾‾‾‾‾‾‾‾‾|_DOE_|‾‾‾‾‾‾‾‾‾‾|_..._|‾‾‾‾‾‾‾‾‾‾|_DO1_|‾‾‾‾‾‾‾‾‾‾|_DO0_
     for(int i = DO_LEN - 1; i >= 0; i--) {
@@ -88,6 +99,7 @@ unsigned int eeprom_93c46_read(
         CLK = 0;
         
         Nop(); Nop(); Nop();
+        __delay_us(1);
         data[i] = DO; Nop();
         Nop(); Nop(); Nop();
     }
