@@ -115,7 +115,3 @@ void debounce_button(int id) {
     ROW2 = 1;
     ROW3 = 1;
 }
-
-void run_button_action(int id) {
-    return;
-}

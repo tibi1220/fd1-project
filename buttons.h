@@ -20,4 +20,3 @@
 void buttons_init();
 int get_pressed_button();
 void debounce_button(int id);
-void run_button_action(int id);

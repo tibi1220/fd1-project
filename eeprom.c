@@ -19,6 +19,14 @@ void eeprom_93c46_init() {
     CLK = 0;
 }
 
+void increment_address(unsigned char *p) {
+    *p = *p == MEMORY_SIZE - 1 ? 0 : *p + 1;
+}
+
+void decrement_address(unsigned char *p) {
+    *p = *p == 0 ? MEMORY_SIZE - 1 : *p - 1;
+}
+
 unsigned int eeprom_93c46_read(
     int int_address, 
     unsigned char *ptr
@@ -88,6 +96,10 @@ unsigned int eeprom_93c46_read(
         Nop(); Nop(); Nop();
     }
     
+    CLK = 1;
+    Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
+    CLK = 0;
+    Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop(); Nop();
     
     // Data out
     // |‾‾‾‾‾‾‾‾‾‾|_DOF_|‾‾‾‾‾‾‾‾‾‾|_DOE_|‾‾‾‾‾‾‾‾‾‾|_..._|‾‾‾‾‾‾‾‾‾‾|_DO1_|‾‾‾‾‾‾‾‾‾‾|_DO0_
