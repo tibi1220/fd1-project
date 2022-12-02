@@ -38,7 +38,7 @@ int main(void) {
     char j = 0;
 
     lcd_cls();
-    sprintf(lcd, "Memcim: 0x%02X ", address);
+    sprintf(lcd, "Memcim:0x%02X/0x%02X", address, MEMORY_SIZE);
     sprintf(lcd + LCD_WIDTH, "HEX:0x%02X, CHAR:%c ", c, c);
     lcd_update();
 
@@ -66,7 +66,7 @@ int main(void) {
                 char c = data >> 8;
 
                 lcd_cls();
-                sprintf(lcd, "Memcim: 0x%02X ", address);
+                sprintf(lcd, "Memcim:0x%02X/0x%02X", address, MEMORY_SIZE);
                 sprintf(lcd + LCD_WIDTH, "HEX:0x%02X, CHAR:%c", c, c);
                 lcd_update();
 
@@ -108,7 +108,7 @@ int main(void) {
                 } else if (button_id == 13) {
                     state = 0;
                     lcd_cls();
-                    sprintf(lcd, "Memcim: 0x%02X ", address);
+                    sprintf(lcd, "Memcim:0x%02X/0x%02X", address, MEMORY_SIZE);
                     sprintf(lcd + LCD_WIDTH, "HEX:0x%02X, CHAR:%c", c, c);
                     lcd_update();
                     break;
